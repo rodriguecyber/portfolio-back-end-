@@ -16,10 +16,11 @@ import { NextFunction } from 'express'
      }
     }
     else{
-        // req.currentUser =await User.findById(decoded.userId);  
+       
         next();
     }
    
     
     })
   }
+//   export const reset

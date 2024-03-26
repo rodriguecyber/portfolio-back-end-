@@ -17,6 +17,7 @@ const usermodel_1 = __importDefault(require("../models/usermodel"));
 const user_valid_1 = require("../validate/user valid");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userAuth_1 = require("../middleware/userAuth");
+const nodemailer_1 = __importDefault(require("nodemailer"));
 const userRouter = (0, express_1.default)();
 userRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newuser = {
@@ -67,4 +68,63 @@ userRouter.get('/login', (req, res) => __awaiter(void 0, void 0, void 0, functio
 userRouter.get('/signout', userAuth_1.userAuth, (req, res) => {
     res.json({ message: "signed in", user: req.currentUser });
 });
+userRouter.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const email = req.body.email;
+    yield usermodel_1.default.findOne({ email: email })
+        .then((user) => {
+        if (!user) {
+            res.json('user not found');
+        }
+        else {
+            const exp = eval(process.env.RESETEXP);
+            const token = jsonwebtoken_1.default.sign({ user: user._id, exp: exp }, process.env.RESET);
+            var transport = nodemailer_1.default.createTransport({
+                host: "sandbox.smtp.mailtrap.io",
+                port: 2525,
+                auth: {
+                    user: "d3894eebe2be21",
+                    pass: "e3833625c046f6"
+                }
+            });
+            const mailOptions = {
+                from: 'rodrirwigara@gmail.com',
+                to: email,
+                subject: 'reset password',
+                text: `http://127.0.0.1:5000/reset-password?token=${token}`
+            };
+            transport.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    res.json(error);
+                }
+                else {
+                    res.json({ message: 'email sent', info: info.response });
+                }
+            });
+        }
+    });
+}));
+userRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.body.token;
+    const password = req.body.password;
+    jsonwebtoken_1.default.verify(token, process.env.RESET, (error, decoded) => __awaiter(void 0, void 0, void 0, function* () {
+        if (error) {
+            res.status(401).json(error.message);
+        }
+        else {
+            try {
+                const user = usermodel_1.default.findOne({ _id: decoded.user });
+                yield user.updateOne({
+                    $set: {
+                        password: password
+                    }
+                });
+                res.json({ message: "Password has been changed successfully!", decoded });
+                decoded.exp = Date.now();
+            }
+            catch (err) {
+                res.json(error);
+            }
+        }
+    }));
+}));
 exports.default = userRouter;

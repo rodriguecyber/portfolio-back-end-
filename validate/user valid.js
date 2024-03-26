@@ -11,9 +11,9 @@ exports.validateSchema = joi_1.default.object({
         .min(5)
         .max(10)
         .messages({
-        "firstName.required": "First name is required",
-        "firstName.min": "First name must be at least 5 characters long",
-        "firstName.max": "First name can not exceed 10 characters"
+        "any.required": "First name is required",
+        "string.min": "First name must be at least 5 characters long",
+        "string.max": "First name can not exceed 10 characters"
     }),
     lastName: joi_1.default.string(),
     email: joi_1.default.string().email({ minDomainSegments: 2 })
@@ -22,15 +22,15 @@ exports.validateSchema = joi_1.default.object({
         .messages({
         "any.required": "Email is required",
         "string.email": "Invalid email format",
-        "email.pattern": "email must look like 'example@gmail.com'"
+        "string.pattern.base": "Email must look like 'example@gmail.com'"
     }),
     password: joi_1.default.string()
         .min(6)
         .max(10)
         .messages({
-        "password.min": "passowrd must have min 5 character",
-        "password.max": "passowrd must have max 10 character",
+        "string.min": "Password must have at least 6 characters",
+        "string.max": "Password must have at most 10 characters",
     }),
     role: joi_1.default.string().valid('admin', 'user')
-        .messages({ "role.valid": "put user or amdin" })
+        .messages({ "any.only": "Role must be either 'admin' or 'user'" })
 });

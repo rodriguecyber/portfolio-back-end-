@@ -24,7 +24,7 @@ messageRouter.post('/Message', (req, res) => __awaiter(void 0, void 0, void 0, f
     });
     yield message.save()
         .then((result) => {
-        res.json({ message: `${result.name} sent ${result.text} at${result.time} using ${result.email}` });
+        res.json({ message: `${result.name} sent '${result.text}' at '${result.time}' using '${result.email}'` });
     })
         .catch((error) => {
         res.json(error);
@@ -36,7 +36,7 @@ messageRouter.get('/message', (req, res) => __awaiter(void 0, void 0, void 0, fu
             {
                 $group: {
                     _id: '$email',
-                    latestDate: { $max: '$time' }, // Get the latest date within each group
+                    latestDate: { $max: '$time' },
                     message: {
                         $push: {
                             text: "$text",

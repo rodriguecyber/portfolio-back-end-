@@ -12,7 +12,7 @@ messageRouter.post('/Message',async(req,res)=>{
     })
 await message.save()
 .then((result)=>{
-    res.json({message:`${result.name} sent ${result.text} at${result.time} using ${result.email}`})
+    res.json({message:`${result.name} sent '${result.text}' at '${result.time}' using '${result.email}'`})
 })
 .catch((error)=>{
     res.json(error)
@@ -25,7 +25,7 @@ const result= await messageSchema.aggregate([
     {
         $group : {
             _id:'$email',
-            latestDate: { $max: '$time' }, // Get the latest date within each group
+            latestDate: { $max: '$time' }, 
             message:{
                 $push:
                 {

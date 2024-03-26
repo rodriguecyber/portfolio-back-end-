@@ -27,9 +27,9 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             }
         }
         else {
-            // req.currentUser =await User.findById(decoded.userId);  
             next();
         }
     }));
 });
 exports.userAuth = userAuth;
+//   export const reset

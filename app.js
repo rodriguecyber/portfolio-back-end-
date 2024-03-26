@@ -8,6 +8,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const messageRouter_1 = __importDefault(require("./routes/messageRouter"));
+const blogRouter_1 = __importDefault(require("./routes/blogRouter"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT;
@@ -23,6 +24,7 @@ db.on('error', () => {
 });
 app.use(userRoutes_1.default);
 app.use(messageRouter_1.default);
+app.use(blogRouter_1.default);
 app.listen(PORT, () => {
     console.log(`app is running on ${PORT}`);
 });
