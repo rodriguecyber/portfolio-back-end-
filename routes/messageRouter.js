@@ -36,6 +36,7 @@ messageRouter.get('/message', (req, res) => __awaiter(void 0, void 0, void 0, fu
             {
                 $group: {
                     _id: '$email',
+                    latestDate: { $max: '$time' }, // Get the latest date within each group
                     message: {
                         $push: {
                             text: "$text",
@@ -43,6 +44,9 @@ messageRouter.get('/message', (req, res) => __awaiter(void 0, void 0, void 0, fu
                         }
                     }
                 }
+            },
+            {
+                $sort: { latestDate: -1 } // Sort groups by the latest date in descending order
             }
         ]);
         const data = result.map(element => ({
