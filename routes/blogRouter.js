@@ -76,7 +76,7 @@ blogRouter.post('/comment/:id', (req, res) => __awaiter(void 0, void 0, void 0, 
         const newComment = new blogs_2.commentSchema({
             blogId: req.params.id,
             comment: req.body.comment,
-            time: Date.now()
+            time: new Date(Date.now()).toISOString()
         });
         yield newComment.save();
         res.json({ message: "commment sent" });
@@ -106,11 +106,15 @@ blogRouter.patch('/updateBlog/:id', (req, res) => __awaiter(void 0, void 0, void
 }));
 blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        blogs_1.default.findByIdAndDelete(req.params.id)
+        yield blogs_1.default.findByIdAndDelete(req.params.id);
+        yield blogs_2.commentSchema.deleteMany({ blogId: req.params.id })
             .then(deleted => {
-            if (deleted === null)
+            if (deleted === null) {
                 return res.status(404).json("No post found");
-            res.status(200).json({ blog: `blog ${deleted} deleted successfull` });
+            }
+            else {
+                res.status(200).json({ blog: `blog ${deleted} deleted successfull` });
+            }
         })
             .catch(error => {
             res.json(error);
@@ -119,5 +123,30 @@ blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (req, res) => __awaite
     catch (error) {
         res.json(error);
     }
+}));
+blogRouter.post('/like/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const liked = req.body.liked;
+    yield blogs_1.default.findOne({ _id: req.params.id })
+        .then(data => {
+        if (!data) {
+            res.json('no blog found');
+        }
+        else {
+            if (liked) {
+                blogs_1.default.updateOne({ _id: req.params.id }, { $inc: { likes: 1 } })
+                    .then(result => {
+                    if (!result) {
+                        res.json({ message: 'failed to like' });
+                    }
+                    else {
+                        res.json({ message: `you liked blog "${data.title}` });
+                    }
+                });
+            }
+            else {
+                res.json({ message: 'please set liked to true' });
+            }
+        }
+    });
 }));
 exports.default = blogRouter;

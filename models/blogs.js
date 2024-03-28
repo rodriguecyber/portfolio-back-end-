@@ -15,7 +15,7 @@ const blogShema = new mongoose_1.default.Schema({
         required: true
     },
     time: {
-        type: Date,
+        type: String,
         required: true
     },
     likes: {
@@ -27,7 +27,7 @@ const blogShema = new mongoose_1.default.Schema({
 const comment = new mongoose_1.default.Schema({
     blogId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'blogs', required: true },
     comment: { type: String, required: true },
-    time: { type: Date, required: true },
+    time: { type: String, required: true },
 });
 exports.commentSchema = mongoose_1.default.model('comment', comment);
 const blogs = mongoose_1.default.model('blogs', blogShema);

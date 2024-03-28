@@ -10,9 +10,10 @@ const blogShema = new mongoose.Schema({
     required:true
  },
  time:{
-  type:Date,
+  type:String,
   required:true
  },
+ 
  likes:{
     type:Number,
     required:true,
@@ -24,7 +25,7 @@ const blogShema = new mongoose.Schema({
 const comment=new mongoose.Schema({
    blogId:{type: mongoose.Schema.Types.ObjectId, ref: 'blogs', required:true},
    comment:{type:String,required:true},
-   time:{type:Date,required:true},
+   time:{type:String,required:true},
 
 })
 export const commentSchema=mongoose.model('comment',comment)

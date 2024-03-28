@@ -70,7 +70,7 @@ catch(error){
       const newComment = new commentSchema({
         blogId: req.params.id,
         comment:req.body.comment,
-        time:Date.now()
+        time:new Date(Date.now()).toISOString()  
         
       })
       await newComment.save()
@@ -101,11 +101,14 @@ catch(error){
     })
     blogRouter.delete('/deleteblog/:id',userAuth,async(req,res)=>{
      try { 
-    blogs.findByIdAndDelete(req.params.id)
+     await blogs.findByIdAndDelete(req.params.id)
+     await commentSchema.deleteMany({blogId:req.params.id})
     .then(deleted=>{
-      if(deleted===null) return res.status(404).json("No post found")
-      res.status(200).json({blog:`blog ${deleted} deleted successfull`})
-    })
+      if(deleted===null) {
+        return res.status(404).json("No post found")
+    }else{              
+      res.status(200).json({blog:`blog  deleted successfull`})
+    }})
     .catch(error=>{
       res.json(error)
     })
@@ -113,5 +116,36 @@ catch(error){
     catch(error){
       res.json(error)
     }
+    })
+    blogRouter.post('/like/:id',async (req,res)=>{
+      const liked=req.body.liked
+      await blogs.findOne({_id:req.params.id})
+      .then(data=>{
+        if(!data){
+    res.json('no blog found')
+        }
+        else{
+          if(liked){
+           blogs.updateOne(
+            {_id:req.params.id},
+            {$inc:{likes:1}},            
+              )
+           .then(result=>{
+            if(!result){
+              res.json({message:'failed to like'})
+            }
+            else{
+              res.json({message:`you liked blog "${data.title}`})
+            }
+           })
+          }
+          else{
+            res.json({message:'please set liked to true'})
+          }
+
+        }
+        
+      })
+      
     })
   export default blogRouter 
