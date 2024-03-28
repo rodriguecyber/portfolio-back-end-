@@ -3,37 +3,36 @@ import User from '../models/usermodel'
 import { validateSchema } from '../validate/user valid'
 import jwt from 'jsonwebtoken'
 import { userAuth } from '../middleware/userAuth'
-import nodemailer from 'nodemailer'
+import transport from '../middleware/transpoter'
+import subscriber from '../models/subscriber'
 
 const userRouter =express()
-userRouter.post('/signup',async(req,res)=>{
- const newuser={
-   firstName:req.body.firstName,
-   lastName:req.body.lastName,
-   email:req.body.email,
-   password:req.body.password,
-   role:req.body.role
- }
- const validation =validateSchema.validate(newuser)
- if(validation.error){
-res.status(400).json({ error: validation.error.details[0].message });
-   
- }
- try
- {
-const user =await User.create(newuser)
-res.json({message:"Registered Successfully",user})
-}
-catch(error:any){
-if(error.code===11000){
-   res.status(409).json('User already exists')
-}
-else{
-   res.json(error)
-}
-}
- })
- userRouter.get('/login',async(req:any,res)=>{
+userRouter.post('/signup', async (req, res) => {
+   const newuser = {
+       firstName: req.body.firstName,
+       lastName: req.body.lastName,
+       email: req.body.email,
+       password: req.body.password
+   };
+
+   const validation = validateSchema.validate(newuser);
+   if (validation.error) {
+       return res.status(400).json({ error: validation.error.details[0].message });
+   }
+
+   try {
+       const user = await User.create(newuser);
+       return res.json({ message: "Registered Successfully", user });
+   } catch (error:any) {
+       if (error.code === 11000) {
+           return res.status(400).json({ error: 'User already exists' });
+       } else {
+           return res.status(500).json({ error: error.message });
+       }
+   }
+});
+
+ userRouter.post('/login',async(req:any,res)=>{
    const username=req.body.email
    const password=req.body.password
   await User.findOne({email:username})
@@ -68,14 +67,6 @@ else{
       const exp=eval(process.env.RESETEXP as string)
    const token = jwt.sign({user:user._id,exp:exp},process.env.RESET as string)
    
-   var transport = nodemailer.createTransport({
-      host: "sandbox.smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD
-      }
-    });
    const mailOptions={
       from:'rodrirwigara@gmail.com',
       to:email,
@@ -99,7 +90,7 @@ userRouter.post('/reset-password',async(req,res)=>{
 jwt.verify(token,process.env.RESET as string,async(error:any,decoded:any)=>{
   
   if(error){
-   res.status(401).json(error.message); 
+   res.json(error.message); 
    }
    else{
       try{
@@ -118,6 +109,19 @@ jwt.verify(token,process.env.RESET as string,async(error:any,decoded:any)=>{
 })
  
    
+})
+userRouter.get('/subscriber',async(req,res)=>{
+   try{
+   const subscribers = await subscriber.find()
+   const subscibeInfo=subscribers.map(result=>({
+      name:result.name,
+      email:result.email
+   }))
+   res.json(subscibeInfo)
+   }
+   catch(error){
+      res.json(error)
+   }
 })
  
 export default userRouter

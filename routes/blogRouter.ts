@@ -3,8 +3,11 @@ import  express  from "express";
 import { commentSchema } from "../models/blogs";
 import { userAuth } from "../middleware/userAuth";
 import { validateBlog } from "../validate/validateBlog";
+import transport from "../middleware/transpoter";
+import subscriber from "../models/subscriber";
 
 const blogRouter=express()
+
   blogRouter.post('/addblogs',userAuth, async (req,res)=>{
   try{
   const newBlog= new blogs({
@@ -13,10 +16,19 @@ const blogRouter=express()
     time:new Date(Date.now()).toISOString()
     
   })
-  const validate=validateBlog.validate(newBlog)
-if(validate.error){return res.json({error:validate.error.details[0].message})}
   await newBlog.save()
   res.json({message:"blog saved "})
+   const savedEmails=await subscriber.find()
+   savedEmails.map(email=>{
+    const mailOptions={
+      from:'rodrirwigara',
+      to:email.email,
+      subject:"new Article",
+      text:"RWigara posted new Article"
+    }
+    transport.sendMail(mailOptions)
+   })
+
 }
 catch(error){
      res.json(error)
@@ -52,13 +64,13 @@ catch(error){
       }
     });
     
-  blogRouter.post('/comment',async(req,res)=>{
+  blogRouter.post('/comment/:id',async(req,res)=>{
     try{ 
 
       const newComment = new commentSchema({
-        blogId: req.body.blogId,
+        blogId: req.params.id,
         comment:req.body.comment,
-        time:new Date(Date.now()).toISOString()
+        time:Date.now()
         
       })
       await newComment.save()
@@ -68,4 +80,38 @@ catch(error){
       res.json(error)
     }
     })
-  export default blogRouter
+    blogRouter.patch('/updateBlog/:id',async(req,res)=>{
+      try{
+     await  blogs.findByIdAndUpdate(req.params.id,req.body,{new:true})
+      .then(updated =>{
+        if(updated===null){
+          res.json('blog not found')
+        }
+        else{
+          res.json(`blog update to ${updated}` )
+        }
+      })
+      .catch(error=>{
+        res.json(error.message)
+      })
+       }
+       catch(error:any){
+    res.json(error.mesaage)
+       }
+    })
+    blogRouter.delete('/deleteblog/:id',userAuth,async(req,res)=>{
+     try { 
+    blogs.findByIdAndDelete(req.params.id)
+    .then(deleted=>{
+      if(deleted===null) return res.status(404).json("No post found")
+      res.status(200).json({blog:`blog ${deleted} deleted successfull`})
+    })
+    .catch(error=>{
+      res.json(error)
+    })
+  }
+    catch(error){
+      res.json(error)
+    }
+    })
+  export default blogRouter 

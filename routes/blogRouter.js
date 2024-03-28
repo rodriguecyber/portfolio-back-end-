@@ -16,7 +16,8 @@ const blogs_1 = __importDefault(require("../models/blogs"));
 const express_1 = __importDefault(require("express"));
 const blogs_2 = require("../models/blogs");
 const userAuth_1 = require("../middleware/userAuth");
-const validateBlog_1 = require("../validate/validateBlog");
+const transpoter_1 = __importDefault(require("../middleware/transpoter"));
+const subscriber_1 = __importDefault(require("../models/subscriber"));
 const blogRouter = (0, express_1.default)();
 blogRouter.post('/addblogs', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -25,12 +26,18 @@ blogRouter.post('/addblogs', userAuth_1.userAuth, (req, res) => __awaiter(void 0
             content: req.body.content,
             time: new Date(Date.now()).toISOString()
         });
-        const validate = validateBlog_1.validateBlog.validate(newBlog);
-        if (validate.error) {
-            return res.json({ error: validate.error.details[0].message });
-        }
         yield newBlog.save();
         res.json({ message: "blog saved " });
+        const savedEmails = yield subscriber_1.default.find();
+        savedEmails.map(email => {
+            const mailOptions = {
+                from: 'rodrirwigara',
+                to: email.email,
+                subject: "new Article",
+                text: "RWigara posted new Article"
+            };
+            transpoter_1.default.sendMail(mailOptions);
+        });
     }
     catch (error) {
         res.json(error);
@@ -64,15 +71,50 @@ blogRouter.get('/blog', (req, res) => __awaiter(void 0, void 0, void 0, function
         res.json(error);
     }
 }));
-blogRouter.post('/comment', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.post('/comment/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newComment = new blogs_2.commentSchema({
-            blogId: req.body.blogId,
+            blogId: req.params.id,
             comment: req.body.comment,
-            time: new Date(Date.now()).toISOString()
+            time: Date.now()
         });
         yield newComment.save();
         res.json({ message: "commment sent" });
+    }
+    catch (error) {
+        res.json(error);
+    }
+}));
+blogRouter.patch('/updateBlog/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield blogs_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true })
+            .then(updated => {
+            if (updated === null) {
+                res.json('blog not found');
+            }
+            else {
+                res.json(`blog update to ${updated}`);
+            }
+        })
+            .catch(error => {
+            res.json(error.message);
+        });
+    }
+    catch (error) {
+        res.json(error.mesaage);
+    }
+}));
+blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        blogs_1.default.findByIdAndDelete(req.params.id)
+            .then(deleted => {
+            if (deleted === null)
+                return res.status(404).json("No post found");
+            res.status(200).json({ blog: `blog ${deleted} deleted successfull` });
+        })
+            .catch(error => {
+            res.json(error);
+        });
     }
     catch (error) {
         res.json(error);

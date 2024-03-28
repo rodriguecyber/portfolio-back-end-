@@ -17,9 +17,9 @@ console.log('database connected')
 db.on('error',()=>{
     console.log("Error in connecting to the database")
 })
-app.use('/api',userRouter)
-app.use('/api',messageRouter)
-app.use('/api',blogRouter)
+app.use('/brand',userRouter)
+app.use('/brand',messageRouter)
+app.use('/brand',blogRouter)
 app.listen(PORT, ()=>{
     console.log(`app is running on ${PORT}`)
     

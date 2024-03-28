@@ -1,25 +1,78 @@
-import { stringify } from "qs";
 import messageSchema from "../models/message";
 import express  from "express";
-
+import { userAuth } from "../middleware/userAuth";
+import subscriber from "../models/subscriber";
+import transport from "../middleware/transpoter";
 const messageRouter = express()
-messageRouter.post('/Message',async(req,res)=>{
+messageRouter.post('/Sendmessage',async(req,res)=>{
     const message= new messageSchema({
     name:req.body.name,
     email:req.body.email,
     text:req.body.text,
     time:Date.now(),
+    
     })
+    try{
 await message.save()
-.then((result)=>{
-    res.json({message:`${result.name} sent '${result.text}' at '${result.time}' using '${result.email}'`})
+
+.then(async(result)=>{
+  const subscribed:boolean=req.body.subscribe
+    if(subscribed===true){
+        try {
+      await subscriber.create({name:result.name,email:result.email})
+      const mailOptions={
+        from:'rodrirwigara@gmail.com',
+        to:result.email as string,
+        subject:'subscription',
+        text:`Mr/Mrs ${result.name} thank you for subscribe to our Website`
+     }
+     transport.sendMail(mailOptions,(error,info)=>{
+     if(error){
+        res.send(error)
+     }
+     else{
+        res.json()
+     }
+     })
+    }
+    catch(error:any){
+    if(error.code===11000){
+        const mailOptions={
+            from:'rodrirwigara@gmail.com',
+        to:result.email as string,
+        subject:'subscription',
+        text:`Mr/Mrs ${result.name} thank you for contact us`
+        }
+        transport.sendMail(mailOptions,(error,info)=>{
+            if(error){
+               res.send(error)
+            }
+            else{
+               res.json()
+            }
+            })
+    }
+    }
+}
+    res.send({message:"thank you for contact us"})
+    const mailOptions={
+        from:'rodrirwigara@gmail.com',
+        to:result.email as string,
+        subject:'subscription',
+        text:`Mr/Mrs ${result.name} thank you for contact us`
+        }
+    transport.sendMail(mailOptions).then(()=>console.log("Email sent"))
 })
 .catch((error)=>{
     res.json(error)
 })
+}
+catch(error){
+    res.json(error)
+}
 })
 
-messageRouter.get('/message', async(req,res)=>{
+messageRouter.get('/message',userAuth, async(req,res)=>{
     try{
 const result= await messageSchema.aggregate([
     {
@@ -37,7 +90,7 @@ const result= await messageSchema.aggregate([
         }
     },
     {
-        $sort: { latestDate: -1 } // Sort groups by the latest date in descending order
+        $sort: { latestDate: -1 } 
     }
 ])   
 
@@ -53,6 +106,24 @@ catch(error){
     res.json(error)
 }
 
+})
+messageRouter.delete('/deletemessage',userAuth, async(req,res)=>{
+    try{
+   await  messageSchema.findByIdAndDelete(req.body.messageId)
+  .then(deleted=>{
+    if(deleted===null){
+    res.json({message:"message not found"})
+} else{
+    res.json({message:`message  '${deleted.text}'  deleted`})
+}
+  })
+  .catch(error=>{
+    res.json(error.message)
+  })
+}
+catch(error){
+    res.json(error)
+}
 })
 
 export default messageRouter

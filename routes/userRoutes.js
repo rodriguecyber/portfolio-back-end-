@@ -17,34 +17,34 @@ const usermodel_1 = __importDefault(require("../models/usermodel"));
 const user_valid_1 = require("../validate/user valid");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userAuth_1 = require("../middleware/userAuth");
-const nodemailer_1 = __importDefault(require("nodemailer"));
+const transpoter_1 = __importDefault(require("../middleware/transpoter"));
+const subscriber_1 = __importDefault(require("../models/subscriber"));
 const userRouter = (0, express_1.default)();
 userRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newuser = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: req.body.password,
-        role: req.body.role
+        password: req.body.password
     };
     const validation = user_valid_1.validateSchema.validate(newuser);
     if (validation.error) {
-        res.status(400).json({ error: validation.error.details[0].message });
+        return res.status(400).json({ error: validation.error.details[0].message });
     }
     try {
         const user = yield usermodel_1.default.create(newuser);
-        res.json({ message: "Registered Successfully", user });
+        return res.json({ message: "Registered Successfully", user });
     }
     catch (error) {
         if (error.code === 11000) {
-            res.status(409).json('User already exists');
+            return res.status(400).json({ error: 'User already exists' });
         }
         else {
-            res.json(error);
+            return res.status(500).json({ error: error.message });
         }
     }
 }));
-userRouter.get('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.email;
     const password = req.body.password;
     yield usermodel_1.default.findOne({ email: username })
@@ -65,8 +65,8 @@ userRouter.get('/login', (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
     });
 }));
-userRouter.get('/signout', userAuth_1.userAuth, (req, res) => {
-    res.json({ message: "signed in", user: req.currentUser });
+userRouter.get('/dashboard', userAuth_1.userAuth, (req, res) => {
+    res.json({ message: "signed in as ", user: req.currentUser });
 });
 userRouter.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const email = req.body.email;
@@ -78,26 +78,18 @@ userRouter.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void
         else {
             const exp = eval(process.env.RESETEXP);
             const token = jsonwebtoken_1.default.sign({ user: user._id, exp: exp }, process.env.RESET);
-            var transport = nodemailer_1.default.createTransport({
-                host: "sandbox.smtp.mailtrap.io",
-                port: 2525,
-                auth: {
-                    user: "d3894eebe2be21",
-                    pass: "e3833625c046f6"
-                }
-            });
             const mailOptions = {
                 from: 'rodrirwigara@gmail.com',
                 to: email,
                 subject: 'reset password',
-                text: `http://127.0.0.1:5000/reset-password?token=${token}`
+                text: `http://127.0.0.1:5000/reset-password?token=${token}   don't share token with anyone`
             };
-            transport.sendMail(mailOptions, (error, info) => {
+            transpoter_1.default.sendMail(mailOptions, (error, info) => {
                 if (error) {
                     res.json(error);
                 }
                 else {
-                    res.json({ message: 'email sent', info: info.response });
+                    res.json({ message: 'token sent. check your email' });
                 }
             });
         }
@@ -108,7 +100,7 @@ userRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 
     const password = req.body.password;
     jsonwebtoken_1.default.verify(token, process.env.RESET, (error, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (error) {
-            res.status(401).json(error.message);
+            res.json(error.message);
         }
         else {
             try {
@@ -118,13 +110,25 @@ userRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 
                         password: password
                     }
                 });
-                res.json({ message: "Password has been changed successfully!", decoded });
-                decoded.exp = Date.now();
+                res.json({ message: "Password has been changed successfully!" });
             }
             catch (err) {
                 res.json(error);
             }
         }
     }));
+}));
+userRouter.get('/subscriber', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const subscribers = yield subscriber_1.default.find();
+        const subscibeInfo = subscribers.map(result => ({
+            name: result.name,
+            email: result.email
+        }));
+        res.json(subscibeInfo);
+    }
+    catch (error) {
+        res.json(error);
+    }
 }));
 exports.default = userRouter;

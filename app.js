@@ -22,9 +22,9 @@ db.once('open', () => {
 db.on('error', () => {
     console.log("Error in connecting to the database");
 });
-app.use(userRoutes_1.default);
-app.use(messageRouter_1.default);
-app.use(blogRouter_1.default);
+app.use('/brand', userRoutes_1.default);
+app.use('/brand', messageRouter_1.default);
+app.use('/brand', blogRouter_1.default);
 app.listen(PORT, () => {
     console.log(`app is running on ${PORT}`);
 });
