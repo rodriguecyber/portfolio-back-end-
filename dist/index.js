@@ -11,7 +11,6 @@ const messageRouter_1 = __importDefault(require("./routes/messageRouter"));
 const blogRouter_1 = __importDefault(require("./routes/blogRouter"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const PORT = process.env.PORT;
 const MONGODBURI = process.env.MONGOURI;
 app.use(express_1.default.json());
 mongoose_1.default.connect(MONGODBURI);
@@ -25,6 +24,4 @@ db.on('error', () => {
 app.use('/brand', userRoutes_1.default);
 app.use('/brand', messageRouter_1.default);
 app.use('/brand', blogRouter_1.default);
-app.listen(PORT, () => {
-    console.log(`app is running on ${PORT}`);
-});
+exports.default = app;

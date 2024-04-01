@@ -1,5 +1,5 @@
 import jwt from'jsonwebtoken'
-import User from '../models/usermodel'
+import roles from '../models/rolers'
 import { NextFunction } from 'express'
  export const userAuth=async(req:any,res:any,next:NextFunction)=>{
   
@@ -10,17 +10,33 @@ import { NextFunction } from 'express'
    {
     if(err.message==='jwt expired')
      {
-        res.json({message:'token has expired'})
+        res.json({message:'token has expired! login again'})
      } else{
-        res.json({message:"invalid token"})
+        res.json({message:"please login"})
      }
     }
     else{
-       
+       req.user=decoded
         next();
     }
    
     
     })
   }
-//   export const reset
+ export const authorize=(role:any,permission:any)=>{
+   return(req:any,res:any,next:any)=>{
+      const userRole=req.user.role
+      if(userRole!==role){
+         return res.json(`you are not ${role}`)
+      }
+      if(!roles[userRole].includes(permission)){
+         res.json(`in your role '${userRole}' permission to ${userRole} is not included` )
+      }
+      else{
+      
+         next()
+      }
+  
+         
+         }
+ }

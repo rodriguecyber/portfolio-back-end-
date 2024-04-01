@@ -55,7 +55,7 @@ userRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, functi
         else {
             if (user.password === password) {
                 const expire = eval(process.env.TOKEN_EXPIRE);
-                const token = jsonwebtoken_1.default.sign({ userId: user._id, exp: expire }, process.env.JWT_SECRET);
+                const token = jsonwebtoken_1.default.sign({ userId: user._id, exp: expire, role: user.role }, process.env.JWT_SECRET);
                 req.currentUser = user;
                 res.json({ message: 'logged in', user: user, token: token });
             }
@@ -118,7 +118,7 @@ userRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 
         }
     }));
 }));
-userRouter.get('/subscriber', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.get('/subscriber', userAuth_1.userAuth, (0, userAuth_1.authorize)('admin', 'read'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const subscribers = yield subscriber_1.default.find();
         const subscibeInfo = subscribers.map(result => ({

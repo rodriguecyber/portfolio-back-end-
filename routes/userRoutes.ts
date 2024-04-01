@@ -2,7 +2,7 @@ import express from 'express'
 import User from '../models/usermodel'
 import { validateSchema } from '../validate/user valid'
 import jwt from 'jsonwebtoken'
-import { userAuth } from '../middleware/userAuth'
+import { authorize, userAuth } from '../middleware/userAuth'
 import transport from '../middleware/transpoter'
 import subscriber from '../models/subscriber'
 
@@ -44,7 +44,7 @@ userRouter.post('/signup', async (req, res) => {
       if(user.password===password){
         
          const expire= eval(process.env.TOKEN_EXPIRE as string)
-      const token=  jwt.sign({userId:user._id, exp:expire},process.env.JWT_SECRET as string)
+      const token=  jwt.sign({userId:user._id, exp:expire,role:user.role},process.env.JWT_SECRET as string)
       req.currentUser=user
        res.json({message:'logged in',user:user, token:token})
       }
@@ -110,7 +110,7 @@ jwt.verify(token,process.env.RESET as string,async(error:any,decoded:any)=>{
  
    
 })
-userRouter.get('/subscriber',async(req,res)=>{
+userRouter.get('/subscriber',userAuth,authorize('admin','read'),async(req,res)=>{
    try{
    const subscribers = await subscriber.find()
    const subscibeInfo=subscribers.map(result=>({

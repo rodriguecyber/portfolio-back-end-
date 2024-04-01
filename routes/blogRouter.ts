@@ -1,22 +1,30 @@
 import blogs from "../models/blogs";
 import  express  from "express";
 import { commentSchema } from "../models/blogs";
-import { userAuth } from "../middleware/userAuth";
+import { authorize, userAuth } from "../middleware/userAuth";
 import { validateBlog } from "../validate/validateBlog";
 import transport from "../middleware/transpoter";
 import subscriber from "../models/subscriber";
 
+
 const blogRouter=express()
 
-  blogRouter.post('/addblogs',userAuth, async (req,res)=>{
+  blogRouter.post('/addblog',userAuth, async (req,res)=>{
   try{
   const newBlog= new blogs({
     title:req.body.title,
     content:req.body.content,
-    time:new Date(Date.now()).toISOString()
-    
+    time:new Date(Date.now()).toISOString()   
+     
   })
-  await newBlog.save()
+   const validation= validateBlog.validate(newBlog)
+   if(validation.error){
+    res.json(validation.error)
+  
+   }
+   else
+  {
+    await newBlog.save()
   res.json({message:"blog saved "})
    const savedEmails=await subscriber.find()
    savedEmails.map(email=>{
@@ -28,6 +36,7 @@ const blogRouter=express()
     }
     transport.sendMail(mailOptions)
    })
+  }
 
 }
 catch(error){
@@ -35,7 +44,7 @@ catch(error){
 }
   })
 
-    blogRouter.get('/blog', async (req, res) => {
+    blogRouter.get('/blogs', async (req, res) => {
       try {
         const blogsWithComments = await blogs.aggregate([
           {
@@ -80,7 +89,7 @@ catch(error){
       res.json(error)
     }
     })
-    blogRouter.patch('/updateBlog/:id',async(req,res)=>{
+    blogRouter.patch('/updateBlog/:id',userAuth,async(req,res)=>{
       try{
      await  blogs.findByIdAndUpdate(req.params.id,req.body,{new:true})
       .then(updated =>{
@@ -99,7 +108,7 @@ catch(error){
     res.json(error.mesaage)
        }
     })
-    blogRouter.delete('/deleteblog/:id',userAuth,async(req,res)=>{
+    blogRouter.delete('/deleteblog/:id',userAuth,authorize('admin','write'),async(req,res)=>{
      try { 
      await blogs.findByIdAndDelete(req.params.id)
      await commentSchema.deleteMany({blogId:req.params.id})

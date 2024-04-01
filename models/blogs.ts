@@ -18,10 +18,10 @@ const blogShema = new mongoose.Schema({
     type:Number,
     required:true,
     default:0
- }
- 
-
-})
+ },
+},
+{ strict: false }
+)
 const comment=new mongoose.Schema({
    blogId:{type: mongoose.Schema.Types.ObjectId, ref: 'blogs', required:true},
    comment:{type:String,required:true},

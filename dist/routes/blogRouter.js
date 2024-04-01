@@ -16,34 +16,41 @@ const blogs_1 = __importDefault(require("../models/blogs"));
 const express_1 = __importDefault(require("express"));
 const blogs_2 = require("../models/blogs");
 const userAuth_1 = require("../middleware/userAuth");
+const validateBlog_1 = require("../validate/validateBlog");
 const transpoter_1 = __importDefault(require("../middleware/transpoter"));
 const subscriber_1 = __importDefault(require("../models/subscriber"));
 const blogRouter = (0, express_1.default)();
-blogRouter.post('/addblogs', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.post('/addblog', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newBlog = new blogs_1.default({
             title: req.body.title,
             content: req.body.content,
             time: new Date(Date.now()).toISOString()
         });
-        yield newBlog.save();
-        res.json({ message: "blog saved " });
-        const savedEmails = yield subscriber_1.default.find();
-        savedEmails.map(email => {
-            const mailOptions = {
-                from: 'rodrirwigara',
-                to: email.email,
-                subject: "new Article",
-                text: "RWigara posted new Article"
-            };
-            transpoter_1.default.sendMail(mailOptions);
-        });
+        const validation = validateBlog_1.validateBlog.validate(newBlog);
+        if (validation.error) {
+            res.json(validation.error);
+        }
+        else {
+            yield newBlog.save();
+            res.json({ message: "blog saved " });
+            const savedEmails = yield subscriber_1.default.find();
+            savedEmails.map(email => {
+                const mailOptions = {
+                    from: 'rodrirwigara',
+                    to: email.email,
+                    subject: "new Article",
+                    text: "RWigara posted new Article"
+                };
+                transpoter_1.default.sendMail(mailOptions);
+            });
+        }
     }
     catch (error) {
         res.json(error);
     }
 }));
-blogRouter.get('/blog', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.get('/blogs', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const blogsWithComments = yield blogs_1.default.aggregate([
             {
@@ -85,7 +92,7 @@ blogRouter.post('/comment/:id', (req, res) => __awaiter(void 0, void 0, void 0, 
         res.json(error);
     }
 }));
-blogRouter.patch('/updateBlog/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.patch('/updateBlog/:id', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield blogs_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true })
             .then(updated => {
@@ -104,7 +111,7 @@ blogRouter.patch('/updateBlog/:id', (req, res) => __awaiter(void 0, void 0, void
         res.json(error.mesaage);
     }
 }));
-blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (0, userAuth_1.authorize)('admin', 'write'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield blogs_1.default.findByIdAndDelete(req.params.id);
         yield blogs_2.commentSchema.deleteMany({ blogId: req.params.id })
@@ -113,7 +120,7 @@ blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (req, res) => __awaite
                 return res.status(404).json("No post found");
             }
             else {
-                res.status(200).json({ blog: `blog ${deleted} deleted successfull` });
+                res.status(200).json({ blog: `blog  deleted successfull` });
             }
         })
             .catch(error => {
