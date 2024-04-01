@@ -107,9 +107,9 @@ catch(error){
 }
 
 })
-messageRouter.delete('/deletemessage',userAuth, async(req,res)=>{
+messageRouter.delete('/deletemessage/:id',userAuth, async(req,res)=>{
     try{
-   await  messageSchema.findByIdAndDelete(req.body.messageId)
+   await  messageSchema.findByIdAndDelete(req.params.id)
   .then(deleted=>{
     if(deleted===null){
     res.json({message:"message not found"})

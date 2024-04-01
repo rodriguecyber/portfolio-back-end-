@@ -131,16 +131,17 @@ blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (0, userAuth_1.authori
         res.json(error);
     }
 }));
-blogRouter.post('/like/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.patch('/like/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const liked = req.body.liked;
-    yield blogs_1.default.findOne({ _id: req.params.id })
+    const blogId = req.params.id;
+    yield blogs_1.default.findById(blogId)
         .then(data => {
         if (!data) {
             res.json('no blog found');
         }
         else {
             if (liked) {
-                blogs_1.default.updateOne({ _id: req.params.id }, { $inc: { likes: 1 } })
+                data.updateOne({ $inc: { likes: 1 } })
                     .then(result => {
                     if (!result) {
                         res.json({ message: 'failed to like' });

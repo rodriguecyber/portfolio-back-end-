@@ -112,9 +112,9 @@ messageRouter.get('/message', userAuth_1.userAuth, (req, res) => __awaiter(void 
         res.json(error);
     }
 }));
-messageRouter.delete('/deletemessage', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+messageRouter.delete('/deletemessage/:id', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield message_1.default.findByIdAndDelete(req.body.messageId)
+        yield message_1.default.findByIdAndDelete(req.params.id)
             .then(deleted => {
             if (deleted === null) {
                 res.json({ message: "message not found" });

@@ -29,7 +29,7 @@ userRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, funct
     };
     const validation = user_valid_1.validateSchema.validate(newuser);
     if (validation.error) {
-        return res.status(400).json({ error: validation.error.details[0].message });
+        return res.status(200).json({ error: validation.error.details[0].message });
     }
     try {
         const user = yield usermodel_1.default.create(newuser);

@@ -5,6 +5,7 @@ import { authorize, userAuth } from "../middleware/userAuth";
 import { validateBlog } from "../validate/validateBlog";
 import transport from "../middleware/transpoter";
 import subscriber from "../models/subscriber";
+import { ObjectId } from "mongoose";
 
 
 const blogRouter=express()
@@ -126,18 +127,18 @@ catch(error){
       res.json(error)
     }
     })
-    blogRouter.post('/like/:id',async (req,res)=>{
+    blogRouter.patch('/like/:id',async (req,res)=>{
       const liked=req.body.liked
-      await blogs.findOne({_id:req.params.id})
+      const blogId=req.params.id as unknown as ObjectId
+      await blogs.findById(blogId)
       .then(data=>{
         if(!data){
     res.json('no blog found')
         }
         else{
           if(liked){
-           blogs.updateOne(
-            {_id:req.params.id},
-            {$inc:{likes:1}},            
+           data.updateOne(
+            {$inc:{likes:1}}         
               )
            .then(result=>{
             if(!result){

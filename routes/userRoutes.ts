@@ -17,7 +17,7 @@ userRouter.post('/signup', async (req, res) => {
 
    const validation = validateSchema.validate(newuser);
    if (validation.error) {
-       return res.status(400).json({ error: validation.error.details[0].message });
+       return res.status(200).json({ error: validation.error.details[0].message });
    }
 
    try {
