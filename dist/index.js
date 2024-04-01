@@ -9,6 +9,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const messageRouter_1 = __importDefault(require("./routes/messageRouter"));
 const blogRouter_1 = __importDefault(require("./routes/blogRouter"));
+const swaggerOptions_1 = __importDefault(require("./swagger/swaggerOptions"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const MONGODBURI = process.env.MONGOURI;
@@ -24,4 +25,5 @@ db.on('error', () => {
 app.use('/brand', userRoutes_1.default);
 app.use('/brand', messageRouter_1.default);
 app.use('/brand', blogRouter_1.default);
+app.use('/api-doc', swaggerOptions_1.default);
 exports.default = app;

@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import userRouter from './routes/userRoutes'
 import messageRouter from './routes/messageRouter'
 import blogRouter from './routes/blogRouter'
+import docRouter from './swagger/swaggerOptions'
 dotenv.config()
 const app = express()
 
@@ -20,5 +21,5 @@ db.on('error',()=>{
 app.use('/brand',userRouter)
 app.use('/brand',messageRouter)
 app.use('/brand',blogRouter)
-
+app.use('/api-doc',docRouter)
 export default app
