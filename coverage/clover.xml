@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1711985824933" clover="3.2.0">
-  <project timestamp="1711985824933" name="All files">
-    <metrics statements="262" coveredstatements="155" conditionals="82" coveredconditionals="40" methods="70" coveredmethods="35" elements="414" coveredelements="230" complexity="0" loc="262" ncloc="262" packages="5" files="13" classes="13"/>
+<coverage generated="1712051900437" clover="3.2.0">
+  <project timestamp="1712051900437" name="All files">
+    <metrics statements="273" coveredstatements="166" conditionals="82" coveredconditionals="40" methods="70" coveredmethods="35" elements="425" coveredelements="241" complexity="0" loc="273" ncloc="273" packages="6" files="14" classes="14"/>
     <package name="portfolio-back-end-">
-      <metrics statements="20" coveredstatements="19" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+      <metrics statements="22" coveredstatements="21" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
       <file name="index.ts" path="D:\Programming Projects\portfolio-back-end-\index.ts">
-        <metrics statements="20" coveredstatements="19" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+        <metrics statements="22" coveredstatements="21" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
         <line num="3" count="3" type="stmt"/>
@@ -14,18 +14,20 @@
         <line num="6" count="3" type="stmt"/>
         <line num="7" count="3" type="stmt"/>
         <line num="8" count="3" type="stmt"/>
-        <line num="10" count="3" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
         <line num="11" count="3" type="stmt"/>
         <line num="12" count="3" type="stmt"/>
         <line num="13" count="3" type="stmt"/>
         <line num="14" count="3" type="stmt"/>
         <line num="15" count="3" type="stmt"/>
-        <line num="17" count="3" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="20" count="3" type="stmt"/>
+        <line num="16" count="3" type="stmt"/>
+        <line num="18" count="3" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
         <line num="21" count="3" type="stmt"/>
         <line num="22" count="3" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
         <line num="24" count="3" type="stmt"/>
+        <line num="25" count="3" type="stmt"/>
       </file>
     </package>
     <package name="portfolio-back-end-.middleware">
@@ -295,6 +297,21 @@
         <line num="120" count="0" type="stmt"/>
         <line num="123" count="0" type="stmt"/>
         <line num="127" count="3" type="stmt"/>
+      </file>
+    </package>
+    <package name="portfolio-back-end-.swagger">
+      <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="swaggerOptions.ts" path="D:\Programming Projects\portfolio-back-end-\swagger\swaggerOptions.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="3" count="3" type="stmt"/>
+        <line num="7" count="3" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="11" count="3" type="stmt"/>
+        <line num="384" count="3" type="stmt"/>
+        <line num="385" count="3" type="stmt"/>
+        <line num="387" count="3" type="stmt"/>
       </file>
     </package>
     <package name="portfolio-back-end-.validate">
