@@ -41,7 +41,7 @@ const authorize = (role, permission) => {
             return res.json(`you are not ${role}`);
         }
         if (!rolers_1.default[userRole].includes(permission)) {
-            res.json(`in your role '${userRole}' permission to ${userRole} is not included`);
+            res.json(`in your role '${userRole}' permission to ${permission} is not included`);
         }
         else {
             next();

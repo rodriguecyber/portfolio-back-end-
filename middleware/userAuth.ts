@@ -30,7 +30,7 @@ import { NextFunction } from 'express'
          return res.json(`you are not ${role}`)
       }
       if(!roles[userRole].includes(permission)){
-         res.json(`in your role '${userRole}' permission to ${userRole} is not included` )
+         res.json(`in your role '${userRole}' permission to ${permission} is not included` )
       }
       else{
       

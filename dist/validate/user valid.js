@@ -26,7 +26,6 @@ exports.validateSchema = joi_1.default.object({
     }),
     password: joi_1.default.string()
         .min(6)
-        .max(10)
         .messages({
         "string.min": "Password must have at least 6 characters",
         "string.max": "Password must have at most 10 characters",

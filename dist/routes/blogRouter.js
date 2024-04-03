@@ -19,33 +19,43 @@ const userAuth_1 = require("../middleware/userAuth");
 const validateBlog_1 = require("../validate/validateBlog");
 const transpoter_1 = __importDefault(require("../middleware/transpoter"));
 const subscriber_1 = __importDefault(require("../models/subscriber"));
+const multer_1 = __importDefault(require("multer"));
+const fs_1 = __importDefault(require("fs"));
+const upload = (0, multer_1.default)({ dest: 'blogs' });
 const blogRouter = (0, express_1.default)();
-blogRouter.post('/addblog', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.post('/addblog', userAuth_1.userAuth, upload.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (!req.file) {
+            return res.status(400).send("No image provided");
+        }
         const newBlog = new blogs_1.default({
             title: req.body.title,
             content: req.body.content,
-            time: new Date(Date.now()).toISOString()
+            time: new Date(Date.now()).toISOString(),
+            image: {
+                data: fs_1.default.readFileSync(req.file.mimetype)
+            }
         });
         const validation = validateBlog_1.validateBlog.validate(newBlog);
-        if (validation.error) {
-            res.json(validation.error);
-        }
-        else {
-            yield newBlog.save();
-            res.json({ message: "blog saved " });
-            const savedEmails = yield subscriber_1.default.find();
-            savedEmails.map(email => {
-                const mailOptions = {
-                    from: 'rodrirwigara',
-                    to: email.email,
-                    subject: "new Article",
-                    text: "RWigara posted new Article"
-                };
-                transpoter_1.default.sendMail(mailOptions);
-            });
-        }
+        //  if(validation.error){
+        //   res.json(validation.error)
+        //  }
+        //  else
+        // {
+        yield newBlog.save();
+        const savedEmails = yield subscriber_1.default.find();
+        savedEmails.map(email => {
+            const mailOptions = {
+                from: 'rodrirwigara',
+                to: email.email,
+                subject: "new Article",
+                text: "Rwigara Brand has new Article"
+            };
+            transpoter_1.default.sendMail(mailOptions);
+        });
+        res.json({ message: "blog saved " });
     }
+    // }
     catch (error) {
         res.json(error);
     }
@@ -67,6 +77,7 @@ blogRouter.get('/blogs', (req, res) => __awaiter(void 0, void 0, void 0, functio
                     title: 1,
                     content: 1,
                     time: 1,
+                    likes: 1,
                     "comments.comment": 1,
                     "comments.time": 1
                 }

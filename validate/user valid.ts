@@ -21,7 +21,6 @@ export const validateSchema = Joi.object({
     }),
   password: Joi.string()
     .min(6)
-    .max(10)
     .messages({
       "string.min":"Password must have at least 6 characters",
       "string.max":"Password must have at most 10 characters",

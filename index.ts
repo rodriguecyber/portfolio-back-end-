@@ -5,8 +5,10 @@ import userRouter from './routes/userRoutes'
 import messageRouter from './routes/messageRouter'
 import blogRouter from './routes/blogRouter'
 import docRouter from './swagger/swaggerOptions'
+import bodyParser = require('body-parser')
 dotenv.config()
 const app = express()
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const MONGODBURI=process.env.MONGOURI as string
 app.use(express.json())

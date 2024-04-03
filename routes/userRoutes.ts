@@ -5,19 +5,23 @@ import jwt from 'jsonwebtoken'
 import { authorize, userAuth } from '../middleware/userAuth'
 import transport from '../middleware/transpoter'
 import subscriber from '../models/subscriber'
-
+import bcrypt from 'bcryptjs'
+import bodyParser from 'body-parser'
 const userRouter =express()
 userRouter.post('/signup', async (req, res) => {
+     const password=req.body.password
+     const salt=bcrypt.genSaltSync(10)
+     const hashedPassword=bcrypt.hashSync(password,salt)
    const newuser = {
        firstName: req.body.firstName,
        lastName: req.body.lastName,
        email: req.body.email,
-       password: req.body.password
+       password: hashedPassword
    };
 
    const validation = validateSchema.validate(newuser);
    if (validation.error) {
-       return res.status(200).json({ error: validation.error.details[0].message });
+       return res.status(200).json({ error: validation.error});
    }
 
    try {
@@ -32,28 +36,47 @@ userRouter.post('/signup', async (req, res) => {
    }
 });
 
- userRouter.post('/login',async(req:any,res)=>{
-   const username=req.body.email
-   const password=req.body.password
-  await User.findOne({email:username})
-   .then((user:any)=>{
-   if(!user){
-      res.json({message:'user not found'})
-   }
-   else{
-      if(user.password===password){
+
+
+userRouter.post('/login', async (req: any, res) => {
+  const password = req.body.password;
+  const username = req.body.email;
+
+  try {
+    const user = await User.findOne({ email: username });
+
+    if (!user) {
+      return res.json({ message: `User ${username} not found`});
+    }
+
+        bcrypt.compare(password, user.password, async(err, isMatch) => {
+      if (err) {
+        throw err; 
+      }
+
+      if (isMatch) {
         
-         const expire= eval(process.env.TOKEN_EXPIRE as string)
-      const token=  jwt.sign({userId:user._id, exp:expire,role:user.role},process.env.JWT_SECRET as string)
-      req.currentUser=user
-       res.json({message:'logged in',user:user, token:token})
+        const expire = eval(process.env.TOKEN_EXPIRE as string);
+        const token = jwt.sign({ 
+         userId: user._id, exp: expire, role: user.role }, 
+         process.env.JWT_SECRET as string
+        );
+
+        
+        req.currentUser = user;
+
+        return res.json({ message: 'Logged in', user: user, token: token });
+      } else {
+        
+        return res.json({ message: 'Password does not match' });
       }
-      else{
-         res.json({message:'password not match'})
-      }
-   }
-   })
- })
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
  userRouter.get('/dashboard', userAuth,(req:any,res)=>{
   res.json({message:"signed in as ", user:req.currentUser})
  })

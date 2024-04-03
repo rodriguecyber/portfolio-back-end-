@@ -19,17 +19,21 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userAuth_1 = require("../middleware/userAuth");
 const transpoter_1 = __importDefault(require("../middleware/transpoter"));
 const subscriber_1 = __importDefault(require("../models/subscriber"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userRouter = (0, express_1.default)();
 userRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const password = req.body.password;
+    const salt = bcryptjs_1.default.genSaltSync(10);
+    const hashedPassword = bcryptjs_1.default.hashSync(password, salt);
     const newuser = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: req.body.password
+        password: hashedPassword
     };
     const validation = user_valid_1.validateSchema.validate(newuser);
     if (validation.error) {
-        return res.status(200).json({ error: validation.error.details[0].message });
+        return res.status(200).json({ error: validation.error });
     }
     try {
         const user = yield usermodel_1.default.create(newuser);
@@ -45,25 +49,34 @@ userRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 }));
 userRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const username = req.body.email;
     const password = req.body.password;
-    yield usermodel_1.default.findOne({ email: username })
-        .then((user) => {
+    const username = req.body.email;
+    try {
+        const user = yield usermodel_1.default.findOne({ email: username });
         if (!user) {
-            res.json({ message: 'user not found' });
+            return res.json({ message: `User ${username} not found` });
         }
-        else {
-            if (user.password === password) {
+        bcryptjs_1.default.compare(password, user.password, (err, isMatch) => __awaiter(void 0, void 0, void 0, function* () {
+            if (err) {
+                throw err;
+            }
+            if (isMatch) {
                 const expire = eval(process.env.TOKEN_EXPIRE);
-                const token = jsonwebtoken_1.default.sign({ userId: user._id, exp: expire, role: user.role }, process.env.JWT_SECRET);
+                const token = jsonwebtoken_1.default.sign({
+                    userId: user._id, exp: expire, role: user.role
+                }, process.env.JWT_SECRET);
                 req.currentUser = user;
-                res.json({ message: 'logged in', user: user, token: token });
+                return res.json({ message: 'Logged in', user: user, token: token });
             }
             else {
-                res.json({ message: 'password not match' });
+                return res.json({ message: 'Password does not match' });
             }
-        }
-    });
+        }));
+    }
+    catch (error) {
+        console.error('Error during login:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 }));
 userRouter.get('/dashboard', userAuth_1.userAuth, (req, res) => {
     res.json({ message: "signed in as ", user: req.currentUser });

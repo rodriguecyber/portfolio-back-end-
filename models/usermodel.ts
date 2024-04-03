@@ -18,7 +18,8 @@ import mongoose from 'mongoose'
             type: String,
             minlength: 6,
             required:true, 
-            },
+
+         },
     role:{
             type:String,
             required:true,
