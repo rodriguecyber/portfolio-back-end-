@@ -19,7 +19,7 @@ const blogShema = new mongoose.Schema({
     required:true,
     default:0
  },
- image:{type:Buffer, contentType:String}
+ image:String
 },
 { strict: false }
 )
