@@ -14,8 +14,6 @@ const bodyParser = require("body-parser");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(bodyParser.urlencoded({ extended: true }));
-// Parse JSON bodies (as sent by API clients)
-app.use(bodyParser.json());
 const MONGODBURI = process.env.MONGOURI;
 app.use(express_1.default.json());
 mongoose_1.default.connect(MONGODBURI);

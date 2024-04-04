@@ -12,57 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const blogs_1 = __importDefault(require("../models/blogs"));
 const express_1 = __importDefault(require("express"));
-const blogs_2 = require("../models/blogs");
+const multer_1 = __importDefault(require("multer"));
 const userAuth_1 = require("../middleware/userAuth");
-const validateBlog_1 = require("../validate/validateBlog");
 const transpoter_1 = __importDefault(require("../middleware/transpoter"));
 const subscriber_1 = __importDefault(require("../models/subscriber"));
-const multer_1 = __importDefault(require("multer"));
-const fs_1 = __importDefault(require("fs"));
-const upload = (0, multer_1.default)({ dest: 'blogs' });
+const blogs_1 = require("../models/blogs");
+const blogs_2 = __importDefault(require("../models/blogs"));
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({
+    cloud_name: 'dxy33wiax',
+    api_key: '991555379284442',
+    api_secret: 'ekuY9MDxVtiIeUGqKbLS0V8MTV4'
+});
+const storage = multer_1.default.diskStorage({
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+const uploadService = (0, multer_1.default)({ storage: storage });
 const blogRouter = (0, express_1.default)();
-blogRouter.post('/addblog', userAuth_1.userAuth, upload.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.post('/addblog', userAuth_1.userAuth, uploadService.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.file) {
             return res.status(400).send("No image provided");
         }
-        const newBlog = new blogs_1.default({
+        const result = yield cloudinary.uploader.upload(req.file.path);
+        const newBlog = new blogs_2.default({
             title: req.body.title,
             content: req.body.content,
             time: new Date(Date.now()).toISOString(),
-            image: {
-                data: fs_1.default.readFileSync(req.file.mimetype)
-            }
+            image: result.secure_url
         });
-        const validation = validateBlog_1.validateBlog.validate(newBlog);
-        //  if(validation.error){
-        //   res.json(validation.error)
-        //  }
-        //  else
-        // {
+        // const validation = validateBlog.validate(newBlog);
+        // if (validation.error) {
+        //   res.json(validation.error);
+        // } else {
         yield newBlog.save();
         const savedEmails = yield subscriber_1.default.find();
         savedEmails.map(email => {
             const mailOptions = {
                 from: 'rodrirwigara',
                 to: email.email,
-                subject: "new Article",
+                subject: "New Article",
                 text: "Rwigara Brand has new Article"
             };
             transpoter_1.default.sendMail(mailOptions);
         });
-        res.json({ message: "blog saved " });
+        res.json({ message: "Blog saved" });
+        // }
     }
-    // }
     catch (error) {
         res.json(error);
     }
 }));
 blogRouter.get('/blogs', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const blogsWithComments = yield blogs_1.default.aggregate([
+        const blogsWithComments = yield blogs_2.default.aggregate([
             {
                 $lookup: {
                     from: "comments",
@@ -78,6 +84,7 @@ blogRouter.get('/blogs', (req, res) => __awaiter(void 0, void 0, void 0, functio
                     content: 1,
                     time: 1,
                     likes: 1,
+                    image: 1,
                     "comments.comment": 1,
                     "comments.time": 1
                 }
@@ -91,7 +98,7 @@ blogRouter.get('/blogs', (req, res) => __awaiter(void 0, void 0, void 0, functio
 }));
 blogRouter.post('/comment/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newComment = new blogs_2.commentSchema({
+        const newComment = new blogs_1.commentSchema({
             blogId: req.params.id,
             comment: req.body.comment,
             time: new Date(Date.now()).toISOString()
@@ -105,7 +112,7 @@ blogRouter.post('/comment/:id', (req, res) => __awaiter(void 0, void 0, void 0, 
 }));
 blogRouter.patch('/updateBlog/:id', userAuth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield blogs_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        yield blogs_2.default.findByIdAndUpdate(req.params.id, req.body, { new: true })
             .then(updated => {
             if (updated === null) {
                 res.json('blog not found');
@@ -124,8 +131,8 @@ blogRouter.patch('/updateBlog/:id', userAuth_1.userAuth, (req, res) => __awaiter
 }));
 blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (0, userAuth_1.authorize)('admin', 'write'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield blogs_1.default.findByIdAndDelete(req.params.id);
-        yield blogs_2.commentSchema.deleteMany({ blogId: req.params.id })
+        yield blogs_2.default.findByIdAndDelete(req.params.id);
+        yield blogs_1.commentSchema.deleteMany({ blogId: req.params.id })
             .then(deleted => {
             if (deleted === null) {
                 return res.status(404).json("No post found");
@@ -145,7 +152,7 @@ blogRouter.delete('/deleteblog/:id', userAuth_1.userAuth, (0, userAuth_1.authori
 blogRouter.patch('/like/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const liked = req.body.liked;
     const blogId = req.params.id;
-    yield blogs_1.default.findById(blogId)
+    yield blogs_2.default.findById(blogId)
         .then(data => {
         if (!data) {
             res.json('no blog found');

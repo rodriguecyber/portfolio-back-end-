@@ -23,6 +23,7 @@ const blogShema = new mongoose_1.default.Schema({
         required: true,
         default: 0
     },
+    image: String
 }, { strict: false });
 const comment = new mongoose_1.default.Schema({
     blogId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'blogs', required: true },

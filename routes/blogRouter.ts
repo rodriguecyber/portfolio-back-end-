@@ -1,57 +1,72 @@
-import blogs from "../models/blogs";
-import  express  from "express";
-import { commentSchema } from "../models/blogs";
+import express from "express";
+import multer from 'multer';
+import fs from "fs";
 import { authorize, userAuth } from "../middleware/userAuth";
 import { validateBlog } from "../validate/validateBlog";
 import transport from "../middleware/transpoter";
 import subscriber from "../models/subscriber";
 import { ObjectId } from "mongoose";
-import multer from 'multer'
-import fs from "fs";
-const upload= multer({dest:'blogs'})
+import { Request } from "express";
+import {commentSchema } from "../models/blogs";
+import blogs from "../models/blogs";
 
+const cloudinary = require('cloudinary').v2;
 
-const blogRouter=express()
+cloudinary.config({
+  cloud_name: 'dxy33wiax',
+   api_key: '991555379284442',
+   api_secret: 'ekuY9MDxVtiIeUGqKbLS0V8MTV4'
+});
 
-  blogRouter.post('/addblog',userAuth,upload.single('image'), async (req,res)=>{
-  try{
-    if(!req.file){
-      return res.status(400).send("No image provided")
-    }
-  const newBlog= new blogs({
-    title:req.body.title,
-    content:req.body.content,
-    time:new Date(Date.now()).toISOString(),
-    image:{
-      data:fs.readFileSync(req.file.mimetype)
-    }
-  })
-   const validation= validateBlog.validate(newBlog)
-  //  if(validation.error){
-  //   res.json(validation.error)
-  
-  //  }
-  //  else
-  // {
-    await newBlog.save()
-    const savedEmails=await subscriber.find()
-   savedEmails.map(email=>{
-    const mailOptions={
-      from:'rodrirwigara',
-      to:email.email,
-      subject:"new Article",
-      text:"Rwigara Brand has new Article"
-    }
-    transport.sendMail(mailOptions)
-   })
-   res.json({message:"blog saved "})
+const storage = multer.diskStorage({
+  filename: function (req: Request, file: any, cb: (error: Error | null, filename: string) => void) {
+    cb(null, file.originalname);
   }
+});
 
-// }
-catch(error){
-     res.json(error)
-}
-  })
+const uploadService = multer({ storage: storage });
+
+const blogRouter = express();
+
+blogRouter.post('/addblog', userAuth, uploadService.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send("No image provided");
+    }
+
+    const result = await cloudinary.uploader.upload(req.file.path);
+
+    const newBlog = new blogs({
+      title: req.body.title,
+      content: req.body.content,
+      time: new Date(Date.now()).toISOString(),
+      image: result.secure_url
+    });
+
+    // const validation = validateBlog.validate(newBlog);
+
+    // if (validation.error) {
+    //   res.json(validation.error);
+    // } else {
+      await newBlog.save();
+      const savedEmails = await subscriber.find();
+      savedEmails.map(email => {
+        const mailOptions = {
+          from: 'rodrirwigara',
+          to: email.email,
+          subject: "New Article",
+          text: "Rwigara Brand has new Article"
+        };
+        transport.sendMail(mailOptions);
+      });
+      res.json({ message: "Blog saved" });
+    // }
+  } catch (error) {
+    res.json(error);
+  }
+});
+
+
 
     blogRouter.get('/blogs', async (req, res) => {
       try {
@@ -71,6 +86,7 @@ catch(error){
             content:1,
             time:1,
             likes:1,
+            image:1,
             "comments.comment":1,
             "comments.time":1
           }  
