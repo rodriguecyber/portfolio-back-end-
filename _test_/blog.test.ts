@@ -27,14 +27,15 @@ describe('GET /api/brand/blog', () => {
   describe('patch/brand/blog', () => {
       test('should update  blog', async () => {
         const response = await request(app)
-          .patch('/brand/updateBlog/:id')
+          .patch('/brand/updateBlog/:id}')
+          .send()
        expect(response.status).toBe(200)
       },20000);
     });
   describe('patch/brand/like', () => {
       test('should like  blog', async () => {
         const response = await request(app)
-          .patch('/brand/like/:id')
+          .patch('/brand/like/6605abd6ef7db60a1704dd1a')
        expect(response.status).toBe(200)
       },20000);
     });

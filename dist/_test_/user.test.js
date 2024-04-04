@@ -18,7 +18,13 @@ const index_1 = __importDefault(require("../index"));
 describe('post/brand/signup', () => {
     (0, globals_1.test)('should register new user ', () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(index_1.default)
-            .post('/brand/signup');
+            .post('/brand/signup')
+            .send({
+            firstname: 'name',
+            lastname: 'name',
+            email: 'name',
+            password: 'name',
+        });
         (0, globals_1.expect)(response.status).toBe(200);
     }), 20000);
 });

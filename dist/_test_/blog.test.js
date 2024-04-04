@@ -40,14 +40,15 @@ describe('post/brand/comment', () => {
 describe('patch/brand/blog', () => {
     (0, globals_1.test)('should update  blog', () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(index_1.default)
-            .patch('/brand/updateBlog/:id');
+            .patch('/brand/updateBlog/:id}')
+            .send();
         (0, globals_1.expect)(response.status).toBe(200);
     }), 20000);
 });
 describe('patch/brand/like', () => {
     (0, globals_1.test)('should like  blog', () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(index_1.default)
-            .patch('/brand/like/:id');
+            .patch('/brand/like/6605abd6ef7db60a1704dd1a');
         (0, globals_1.expect)(response.status).toBe(200);
     }), 20000);
 });

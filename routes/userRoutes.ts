@@ -6,7 +6,6 @@ import { authorize, userAuth } from '../middleware/userAuth'
 import transport from '../middleware/transpoter'
 import subscriber from '../models/subscriber'
 import bcrypt from 'bcryptjs'
-import bodyParser from 'body-parser'
 const userRouter =express()
 userRouter.post('/signup', async (req, res) => {
      const password=req.body.password

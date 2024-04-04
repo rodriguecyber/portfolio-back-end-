@@ -5,6 +5,12 @@ describe('post/brand/signup', () => {
     test('should register new user ', async () => {
       const response = await request(app)
         .post('/brand/signup')
+        .send({
+          firstname:'name',
+          lastname:'name',
+          email:'name',
+          password:'name',
+        })
      expect(response.status).toBe(200)
     },20000);
   });
