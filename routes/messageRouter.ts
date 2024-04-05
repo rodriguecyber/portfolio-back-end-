@@ -82,6 +82,7 @@ const result= await messageSchema.aggregate([
             message:{
                 $push:
                 {
+                id:"$id",
                 text:"$text",
                 sent:"$time"
             }

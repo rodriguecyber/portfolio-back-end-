@@ -92,6 +92,7 @@ messageRouter.get('/message', userAuth_1.userAuth, (req, res) => __awaiter(void 
                     latestDate: { $max: '$time' },
                     message: {
                         $push: {
+                            id: "$id",
                             text: "$text",
                             sent: "$time"
                         }
