@@ -6,6 +6,7 @@ import messageRouter from './routes/messageRouter'
 import blogRouter from './routes/blogRouter'
 import docRouter from './swagger/swaggerOptions'
 import bodyParser = require('body-parser')
+import  cors from 'cors'
 dotenv.config()
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,6 +21,7 @@ console.log('database connected')
 db.on('error',()=>{
     console.log("Error in connecting to the database")
 })
+app.use(cors())
 app.use('/brand',userRouter)
 app.use('/brand',messageRouter)
 app.use('/brand',blogRouter)

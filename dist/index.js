@@ -11,6 +11,7 @@ const messageRouter_1 = __importDefault(require("./routes/messageRouter"));
 const blogRouter_1 = __importDefault(require("./routes/blogRouter"));
 const swaggerOptions_1 = __importDefault(require("./swagger/swaggerOptions"));
 const bodyParser = require("body-parser");
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,6 +25,7 @@ db.once('open', () => {
 db.on('error', () => {
     console.log("Error in connecting to the database");
 });
+app.use((0, cors_1.default)());
 app.use('/brand', userRoutes_1.default);
 app.use('/brand', messageRouter_1.default);
 app.use('/brand', blogRouter_1.default);
