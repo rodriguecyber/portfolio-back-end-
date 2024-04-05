@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import { authorize, userAuth } from '../middleware/userAuth'
 import transport from '../middleware/transpoter'
 import subscriber from '../models/subscriber'
-import bcrypt from 'bcryptjs'
+import bcrypt, { hashSync } from 'bcryptjs'
 const userRouter =express()
 userRouter.post('/signup', async (req, res) => {
      const password=req.body.password
@@ -109,6 +109,8 @@ userRouter.post('/login', async (req: any, res) => {
 userRouter.post('/reset-password',async(req,res)=>{
  const token=req.body.token
  const password=req.body.password
+ const salt=bcrypt.genSaltSync(10)
+ const hashedPassword=bcrypt.hashSync(password,salt)
 jwt.verify(token,process.env.RESET as string,async(error:any,decoded:any)=>{
   
   if(error){
@@ -119,7 +121,7 @@ jwt.verify(token,process.env.RESET as string,async(error:any,decoded:any)=>{
     const  user=User.findOne({_id:decoded.user})
     await user.updateOne({
       $set:{
-     password:password
+     password:hashedPassword
       }
      })
    res.json({message:"Password has been changed successfully!"})

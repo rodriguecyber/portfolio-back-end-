@@ -111,6 +111,8 @@ userRouter.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void
 userRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.body.token;
     const password = req.body.password;
+    const salt = bcryptjs_1.default.genSaltSync(10);
+    const hashedPassword = bcryptjs_1.default.hashSync(password, salt);
     jsonwebtoken_1.default.verify(token, process.env.RESET, (error, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (error) {
             res.json(error.message);
@@ -120,7 +122,7 @@ userRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 
                 const user = usermodel_1.default.findOne({ _id: decoded.user });
                 yield user.updateOne({
                     $set: {
-                        password: password
+                        password: hashedPassword
                     }
                 });
                 res.json({ message: "Password has been changed successfully!" });

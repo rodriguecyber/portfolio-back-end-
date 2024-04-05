@@ -22,16 +22,20 @@ describe('post/brand/signup', () => {
     },20000);
   });
   describe('post/brand/forgot-password', () => {
-    test('should let create reset password token ', async () => {
+    test('should let user create reset password token ', async () => {
       const response = await request(app)
         .post('/brand/forgot-password')
      expect(response.status).toBe(200)
     },20000);
   });
   describe('post/brand/reset-password', () => {
-    test('should let create reset password token ', async () => {
+    test('should let user reset password  ', async () => {
       const response = await request(app)
         .post('/brand/reset-password')
+        .send({
+          token:"1",
+          password:"newPassword",
+        })
      expect(response.status).toBe(200)
     },20000);
   });

@@ -36,16 +36,20 @@ describe('post/brand/login', () => {
     }), 20000);
 });
 describe('post/brand/forgot-password', () => {
-    (0, globals_1.test)('should let create reset password token ', () => __awaiter(void 0, void 0, void 0, function* () {
+    (0, globals_1.test)('should let user create reset password token ', () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(index_1.default)
             .post('/brand/forgot-password');
         (0, globals_1.expect)(response.status).toBe(200);
     }), 20000);
 });
 describe('post/brand/reset-password', () => {
-    (0, globals_1.test)('should let create reset password token ', () => __awaiter(void 0, void 0, void 0, function* () {
+    (0, globals_1.test)('should let user reset password  ', () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(index_1.default)
-            .post('/brand/reset-password');
+            .post('/brand/reset-password')
+            .send({
+            token: "1",
+            password: "newPassword",
+        });
         (0, globals_1.expect)(response.status).toBe(200);
     }), 20000);
 });
