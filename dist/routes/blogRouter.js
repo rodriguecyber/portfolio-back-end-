@@ -79,7 +79,7 @@ blogRouter.get('/blogs', (req, res) => __awaiter(void 0, void 0, void 0, functio
             },
             {
                 $project: {
-                    _id: 0,
+                    _id: 1,
                     title: 1,
                     content: 1,
                     time: 1,

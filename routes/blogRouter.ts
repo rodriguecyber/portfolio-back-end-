@@ -81,7 +81,7 @@ blogRouter.post('/addblog', userAuth, uploadService.single('image'), async (req,
           },
           {
           $project:{
-            _id:0,
+            _id:1,
             title:1,
             content:1,
             time:1,
