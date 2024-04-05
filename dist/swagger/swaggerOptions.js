@@ -18,7 +18,7 @@ const options = {
     },
     servers: [
         {
-            url: 'https://portfolio-back-end-1-pm2e.onrender.com'
+            url: 'https://portfolio-back-end-1-pm2e.onrender.com/brand'
         }
     ],
     security: [
@@ -116,6 +116,11 @@ const options = {
                         'application/json': {
                             schema: { $ref: '#/components/schemas/Blog' }
                         }
+                    }
+                },
+                response: {
+                    200: {
+                        description: 'success'
                     }
                 }
             }

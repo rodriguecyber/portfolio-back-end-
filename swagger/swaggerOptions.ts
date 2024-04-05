@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, response } from "express";
 import dotenv from "dotenv";
 import { setup, serve } from "swagger-ui-express";
 import mongoose from "mongoose";
@@ -116,6 +116,11 @@ const options = {
                         'application/json': {
                             schema: { $ref: '#/components/schemas/Blog' }
                         }
+                    }
+                },
+                response:{
+                    200:{
+                        description:'success'
                     }
                 }
             }
