@@ -14,13 +14,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const MONGODBURI=process.env.MONGOURI as string
 app.use(express.json())
 mongoose.connect(MONGODBURI)
-const db=mongoose.connection
-db.once('open',()=>{
-console.log('database connected')
-})
-db.on('error',()=>{
-    console.log("Error in connecting to the database")
-})
 app.use(cors())
 app.use('/brand',userRouter)
 app.use('/brand',messageRouter)
