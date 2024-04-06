@@ -31,4 +31,4 @@ jobs:
           echo "PASSWORD=${{secrets.PASSWORD}}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npm test correct
+        run: npm test
