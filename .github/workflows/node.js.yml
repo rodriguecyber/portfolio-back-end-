@@ -20,13 +20,15 @@ jobs:
   
       - name: Install dependencies
         run: npm install
+
       - name: setting environment variable
-        env:
-          JWT_SECRET: ${{secrets.JWT_SECRET}}
-          RESET: ${{secrets.RESET}}
-          TOKEN_EXPIRE: ${{secrets.TOKEN_EPIRE}}
-          RESETEXP: ${{secrets.RESETEXP}}
-          EMAIL: ${{secrets.EMAIL}}
-          PASSWORD: ${{secrets.PASSWORD}}
+        run: |
+          echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> $GITHUB_ENV
+          echo "RESET=${{secrets.RESET}}" >> $GITHUB_ENV
+          echo "TOKEN_EXPIRE=${{secrets.TOKEN_EXPIRE}}" >> $GITHUB_ENV
+          echo "RESETEXP=${{secrets.RESETEXP}}" >> $GITHUB_ENV
+          echo "EMAIL=${{secrets.EMAIL}}" >> $GITHUB_ENV
+          echo "PASSWORD=${{secrets.PASSWORD}}" >> $GITHUB_ENV
+
       - name: Run tests
-        run: npm test
+        run: npm test correct
