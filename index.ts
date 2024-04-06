@@ -11,9 +11,8 @@ dotenv.config()
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const MONGODBURI=process.env.MONGOURI as string
 app.use(express.json())
-mongoose.connect(MONGODBURI)
+
 app.use(cors())
 app.use('/brand',userRouter)
 app.use('/brand',messageRouter)

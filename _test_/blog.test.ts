@@ -1,8 +1,20 @@
-import { jest,test,expect,afterAll } from "@jest/globals"
+import { jest,test,expect,afterAll,beforeAll } from "@jest/globals"
 import request from'supertest'
 import app from '../index'
+import mongoose from "mongoose";
+  
+
 //  testing blog routes
-describe('GET /api/brand/blog', () => {
+describe('testing blog routes',()=>{
+  beforeAll(async()=>{
+    await mongoose.connect('mongodb+srv://user1:user1@cluster0.q3w70mq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+  },20000)
+  afterAll(async()=>{
+    await mongoose.connection.close();
+    await mongoose.disconnect()
+    
+  })
+  describe('GET /api/brand/blog', () => {
     test('should get all blogs', async () => {
       const response = await request(app)
         .get('/brand/blogs')
@@ -48,3 +60,4 @@ describe('GET /api/brand/blog', () => {
     });
  
   
+})

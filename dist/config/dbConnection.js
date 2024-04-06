@@ -12,10 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __importDefault(require("./index"));
-const dbConnection_1 = __importDefault(require("./config/dbConnection"));
-const PORT = process.env.PORT;
-index_1.default.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, dbConnection_1.default)();
-    console.log(`app is running on ${PORT}`);
-}));
+const dotenv_1 = __importDefault(require("dotenv"));
+const mongoose_1 = __importDefault(require("mongoose"));
+dotenv_1.default.config;
+const connectdb = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const MONGODBURI = process.env.MONGOURI;
+        mongoose_1.default.connect(MONGODBURI);
+        console.log('connected to database');
+    }
+    catch (error) {
+        console.log(`Error ${error}`);
+    }
+});
+exports.default = connectdb;

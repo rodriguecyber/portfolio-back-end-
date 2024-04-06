@@ -1,9 +1,16 @@
-import { jest,test,expect,afterAll } from "@jest/globals"
+import { jest,test,expect,afterAll,beforeAll } from "@jest/globals"
 import request from'supertest'
 import app from '../index'
-// testing message routes
-
-describe('post/brand/sendmessage', () => {
+import mongoose from "mongoose"
+describe('testing message routes',()=>{
+  beforeAll(async()=>{
+    await mongoose.connect('mongodb+srv://user1:user1@cluster0.q3w70mq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+  })
+  afterAll(async()=>{
+  await mongoose.connection.close()
+  await mongoose.disconnect()
+  })
+  describe('post/brand/sendmessage', () => {
     test('should send message', async () => {
       const response = await request(app)
         .post('/brand/Sendmessage')
@@ -25,4 +32,8 @@ describe('get/brand/deletemessage', () => {
     },20000);
   });
 
+
+
+})
+// testing message routes
 
