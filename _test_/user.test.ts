@@ -28,6 +28,10 @@ describe('post/brand/login', () => {
   test('should let user login ', async () => {
     const response = await request(app)
       .post('/brand/login')
+      .send({
+        email:'email',
+        password:'password'
+      })
    expect(response.status).toBe(200)
   },20000);
 });
