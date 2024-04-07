@@ -8,8 +8,8 @@ const transport = nodemailer_1.default.createTransport({
     host: "sandbox.smtp.mailtrap.io",
     port: 2525,
     auth: {
-        user: "d3894eebe2be21",
-        pass: "e3833625c046f6"
+        user: "44c6a3d194108b",
+        pass: "e1da894e99b912"
     }
 });
 exports.default = transport;

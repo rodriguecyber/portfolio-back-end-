@@ -90,7 +90,7 @@ userRouter.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void
         }
         else {
             const exp = eval(process.env.RESETEXP);
-            const token = jsonwebtoken_1.default.sign({ user: user._id, exp: exp }, process.env.RESET);
+            const token = jsonwebtoken_1.default.sign({ user: user._id, exp: exp }, process.env.JWT_SECRET);
             const mailOptions = {
                 from: 'rodrirwigara@gmail.com',
                 to: email,
