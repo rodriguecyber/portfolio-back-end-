@@ -86,8 +86,8 @@ userRouter.post('/login', async (req: any, res) => {
    if(!user){
   res.json('user not found')
    }else{
-      const exp=eval(process.env.TOKEN_EXPIRE as string)
-   const token = jwt.sign({user:user._id,exp:exp},process.env.JWT_SECRET as string)
+      const exp=200000
+   const token = jwt.sign({user:user._id,exp:exp},'RWIGARA')
    
    const mailOptions={
       from:'rodrirwigara@gmail.com',
