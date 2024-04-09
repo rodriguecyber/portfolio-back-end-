@@ -1,4 +1,4 @@
-name: myBrand CI
+name: mmybrand CI
 
 on:
   push:
