@@ -11,7 +11,9 @@ import { NextFunction } from 'express'
     if(err.message==='jwt expired')
      {
         res.json({message:'token has expired! login again'})
-     } else{
+
+        res.status(401).send('Unauthorized')
+           } else{
         res.json({message:"please login"})
      }
     }
