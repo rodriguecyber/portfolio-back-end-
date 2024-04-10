@@ -10,11 +10,10 @@ import { NextFunction } from 'express'
    {
     if(err.message==='jwt expired')
      {
-        res.json({message:'token has expired! login again'})
+        res.status(401).json({message:'token has expired! login again'})
 
-        res.status(401).send('Unauthorized')
            } else{
-        res.json({message:"please login"})
+        res.status(401).json({message:"please login"})
      }
     }
     else{
@@ -29,10 +28,10 @@ import { NextFunction } from 'express'
    return(req:any,res:any,next:any)=>{
       const userRole=req.user.role
       if(userRole!==role){
-         return res.json(`you are not ${role}`)
+         return res.status(403).json(`you are not ${role}`)
       }
       if(!roles[userRole].includes(permission)){
-         res.json(`in your role '${userRole}' permission to ${permission} is not included` )
+         res.status(403).json(`in your role '${userRole}' permission to ${permission} is not included` )
       }
       else{
       
