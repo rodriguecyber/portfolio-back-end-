@@ -22,6 +22,7 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         if (err) {
             if (err.message === 'jwt expired') {
                 res.json({ message: 'token has expired! login again' });
+                res.status(401).send('Unauthorized');
             }
             else {
                 res.json({ message: "please login" });

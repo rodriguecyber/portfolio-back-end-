@@ -7,6 +7,7 @@ import blogRouter from './routes/blogRouter'
 import docRouter from './swagger/swaggerOptions'
 import bodyParser = require('body-parser')
 import  cors from 'cors'
+import express = require('express')
 dotenv.config()
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }));
