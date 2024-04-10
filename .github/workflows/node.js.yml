@@ -27,8 +27,7 @@ jobs:
           echo "RESET=${{secrets.RESET}}" >> $GITHUB_ENV
           echo "TOKEN_EXPIRE=${{secrets.TOKEN_EXPIRE}}" >> $GITHUB_ENV
           echo "RESETEXP=${{secrets.RESETEXP}}" >> $GITHUB_ENV
-          echo "EMAIL=${{secrets.EMAIL}}" >> $GITHUB_ENV
-          echo "PASSWORD=${{secrets.PASSWORD}}" >> $GITHUB_ENV
+
 
       - name: Run tests
         run: npm test
