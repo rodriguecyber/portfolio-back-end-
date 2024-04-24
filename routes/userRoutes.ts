@@ -147,5 +147,8 @@ userRouter.get('/subscriber',userAuth,authorize('admin','read'),async(req,res)=>
       res.json(error)
    }
 })
+userRouter.post('/isloggedin',userAuth,async(req,res)=>{
+  res.json({message:'logged in'})
+})
  
 export default userRouter
