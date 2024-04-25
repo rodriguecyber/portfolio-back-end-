@@ -285,7 +285,7 @@ const options = {
             }
         },
         '/islogedin': {
-            get: {
+            post: {
                 summary: "verify token valid ",
                 tags: ["protect admin dashboard"],
                 responses: {
