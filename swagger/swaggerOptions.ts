@@ -284,6 +284,20 @@ const options = {
                 }
             }
         },
+        '/islogedin': {
+            get: {
+                summary: "verify token valid ",
+                tags: ["protect admin dashboard"],
+                responses: {
+                    '200': {
+                        description: "Success"
+                    },
+                    '400': {
+                        description: "Unauthorized"
+                    }
+                }
+            }
+        },
     },
     components: {
         securitySchemes: {
